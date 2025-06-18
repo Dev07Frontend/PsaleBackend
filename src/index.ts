@@ -59,7 +59,7 @@ const app = new Elysia()
     })
   )
   // Пример маршрута для проверки работоспособности
-  .get("/", () => "Server is running")
+  .get("/", () => "Сервер запущен!")
   .listen(3050);
 
 console.log(
