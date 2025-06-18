@@ -1,11 +1,11 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
-import authRoutes from "./server/routes/auth";
-import userRoutes from "./server/routes/user";
+import authRoutes from "./src/server/routes/auth";
+import userRoutes from "./src/server/routes/user";
 import { cors } from "@elysiajs/cors";
-import { referenceRoutes } from "./server/routes/reference";
-import { moduleRoutes } from "./server/routes/modules";
-import { lessonRoutes } from "./server/routes/lessons";
+import { referenceRoutes } from "./src/server/routes/reference";
+import { moduleRoutes } from "./src/server/routes/modules";
+import { lessonRoutes } from "./src/server/routes/lessons";
 import { staticPlugin } from "@elysiajs/static";
 import { join } from "path";
 
