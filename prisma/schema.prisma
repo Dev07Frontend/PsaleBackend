@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int             @id @default(autoincrement())
+  email        String          @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         Role
+  avatarURL    String?         @default("/avatar.png")
+  bgCover      String?         @default("/userCover.png")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  userProgress UserProgress[]
+  quizResults  QuizResult[]
+}
+
+model Module {
+  id           Int             @id @default(autoincrement())
+  title        String
+  description  String
+  image        String
+  order        Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  lessons      Lesson[]
+  userProgress UserProgress[]
+
+  @@index([order])
+}
+
+model Lesson {
+  id           Int             @id @default(autoincrement())
+  title        String
+  order        Int
+  moduleId     Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  module       Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  theory       Theory?
+  quizzes      Quiz[]
+  userProgress UserProgress[]
+
+  @@index([moduleId, order])
+}
+
+model Theory {
+  id        Int      @id @default(autoincrement())
+  content   String
+  lessonId  Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+}
+
+model Quiz {
+  id             Int              @id @default(autoincrement())
+  lessonId       Int
+  type           QuizType
+  question       String
+  explanation    String?
+  order          Int
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  imageUrl String? // путь до картинки, например /uploads/img.png
+  audioUrl String? // путь до аудио файла
+  lesson         Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  answers        QuizAnswer[]
+  matches        QuizMatch[]
+  blanks         QuizBlank[]
+  results        QuizResult[]
+
+  @@index([lessonId, order])
+}
+
+model QuizAnswer {
+  id        Int      @id @default(autoincrement())
+  quizId    Int
+  text      String
+  isCorrect Boolean
+  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model QuizMatch {
+  id        Int    @id @default(autoincrement())
+  quizId    Int
+  left      String
+  right     String
+  quiz      Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model QuizBlank {
+  id        Int    @id @default(autoincrement())
+  quizId    Int
+  before    String
+  after     String
+  correct   String
+  quiz      Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model QuizResult {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  quizId            Int
+  selectedOptionIds String[]     // MULTIPLE_*
+  fillBlankAnswers  String[]     // FILL_IN_THE_BLANK
+  matchedPairs      Json?         // MATCHING (массив объектов вида [{ left: "...", right: "..." }])
+  isCorrect         Boolean
+  createdAt         DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz              Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, quizId])
+  @@index([userId, quizId])
+}
+
+model UserProgress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  lessonId    Int
+  moduleId    Int
+  score       Int      @default(0)
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId, lessonId])
+}
+
+model ReferenceTopic {
+  id          String           @id @default(cuid())
+  order       Int
+  title       String
+  description String?
+  content     Json?
+  files       ReferenceFile[]
+  tables      ReferenceTable[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model ReferenceFile {
+  id          String         @id @default(cuid())
+  name        String
+  url         String
+  topicId     String
+  topic       ReferenceTopic @relation(fields: [topicId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @default(now())
+}
+
+model ReferenceTable {
+  id          String         @id @default(cuid())
+  title       String
+  rows        Json
+  topicId     String
+  topic       ReferenceTopic @relation(fields: [topicId], references: [id])
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+enum QuizType {
+  MULTIPLE_CHOICE     // Один правильный ответ
+  MULTIPLE_SELECT     // Несколько правильных
+  TRUE_FALSE          // Да/Нет
+  FILL_IN_THE_BLANK   // Пропуски в тексте
+  MATCHING            // Сопоставление
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+  TEACHER
+}
