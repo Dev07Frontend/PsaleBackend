@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
-import authRoutes from "../server/routes/auth";
-import userRoutes from "server/routes/user";
+import authRoutes from "./server/routes/auth";
+import userRoutes from "./server/routes/user";
 import { cors } from "@elysiajs/cors";
 import { referenceRoutes } from "./src/server/routes/reference";
 import { moduleRoutes } from "./src/server/routes/modules";
