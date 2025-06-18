@@ -10,13 +10,19 @@ import { staticPlugin } from "@elysiajs/static";
 import { join } from "path";
 
 const app = new Elysia()
+  // Логирование всех запросов
+  .onRequest(({ request }) => {
+    console.log(`[${request.method}] ${request.url}`);
+  })
+
+  // Настройки CORS для Coolify
   .use(
     cors({
-      origin: "*", // Разрешаем только Next.js
-      methods: ["GET", "POST", "PUT", "DELETE"], // Разрешенные методы
-      allowedHeaders: ["*"], // Разрешить все заголовки
-      origin: true, // Автоматически отражает origin запроса
-      credentials: true
+      origin: /.*\.sslip\.io$/, // Разрешаем все поддомены sslip.io
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      credentials: true,
+      exposedHeaders: ["Content-Disposition"] // Для файловых загрузок
     })
   )
   // Подключаем маршруты авторизации
