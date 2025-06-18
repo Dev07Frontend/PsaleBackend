@@ -20,8 +20,8 @@ const app = new Elysia()
     cors({
       origin: [
         'http://localhost:3000',                 // Local development
-        /^https?:\/\/[a-z0-9-]+\.sslip\.io$/,   // All sslip.io subdomains
-        'https://your-production-domain.com'     // Production domain
+        /^http?:\/\/[a-z0-9-]+\.sslip\.io$/,   // All sslip.io subdomains
+        'http://g8ccwkos8g40kskk8g0gc4gg.109.172.101.92.sslip.io'     // Production domain
       ],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
