@@ -1,8 +1,8 @@
 import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
 import { swagger } from "@elysiajs/swagger";
 import authRoutes from "./server/routes/auth";
 import userRoutes from "./server/routes/user";
-import { cors } from "@elysiajs/cors";
 import { referenceRoutes } from "./server/routes/reference";
 import { moduleRoutes } from "./server/routes/modules";
 import { lessonRoutes } from "./server/routes/lessons";
@@ -15,31 +15,26 @@ const app = new Elysia()
     console.log(`[${request.method}] ${request.url}`);
   })
 
-  // Настройки CORS для Coolify
+  // Настройки CORS для разрешения всех источников
   .use(
     cors({
-      origin: [
-        'http://localhost:3000',                 // Local development
-        /^http?:\/\/[a-z0-9-]+\.sslip\.io$/,   // All sslip.io subdomains
-        'http://g8ccwkos8g40kskk8g0gc4gg.109.172.101.92.sslip.io'     // Production domain
-      ],
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-      exposedHeaders: ['Content-Disposition'],
+      origin: true, // Разрешить все источники
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Разрешенные методы
+      allowedHeaders: ["Content-Type", "Authorization"], // Разрешенные заголовки
+      credentials: true, // Поддержка кук
+      preflight: true, // Обработка предварительных запросов
     })
   )
-  // Подключаем маршруты авторизации
+  // Подключаем маршруты
   .use(authRoutes)
   .use(userRoutes)
-  // Подключение маршрутов справочника
   .use(referenceRoutes)
   .use(moduleRoutes)
   .use(lessonRoutes)
   .use(
     swagger({
-      path: "/docs", // Путь, по которому будет доступна документация
-      exclude: ["/secret"], // Исключить определенные пути из документации
+      path: "/docs",
+      exclude: ["/secret"],
       documentation: {
         info: {
           title: "Psale API Documentation",
@@ -65,11 +60,11 @@ const app = new Elysia()
   )
   .use(
     staticPlugin({
-      assets: join(__dirname, "uploads"), // Путь относительно корня проекта Elysia
+      assets: join(__dirname, "uploads"),
       prefix: "/uploads",
     })
   )
-  // Пример маршрута для проверки работоспособности
+  // Проверка работоспособности
   .get("/", () => "Сервер запущен!")
   .listen(3050);
 
