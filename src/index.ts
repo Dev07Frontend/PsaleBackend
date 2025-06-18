@@ -18,7 +18,11 @@ const app = new Elysia()
   // Настройки CORS для Coolify
   .use(
     cors({
-      origin: /.*\.sslip\.io$/, // Разрешаем все поддомены sslip.io
+      origin: [
+        'http://localhost:3000',                 // Local development
+        /^https?:\/\/[a-z0-9-]+\.sslip\.io$/,   // All sslip.io subdomains
+        'https://your-production-domain.com'     // Production domain
+      ],
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
