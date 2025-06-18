@@ -14,8 +14,8 @@ const app = new Elysia()
     cors({
       origin: "*", // Разрешаем только Next.js
       methods: ["GET", "POST", "PUT", "DELETE"], // Разрешенные методы
-      allowedHeaders: ["Content-Type", "Authorization"], // Разрешенные заголовки
-      credentials: true, // Разрешаем куки и авторизацию
+      origin: true, // Автоматически отражает origin запроса
+      credentials: true
     })
   )
   // Подключаем маршруты авторизации
