@@ -12,7 +12,7 @@ import { join } from "path";
 const app = new Elysia()
   .use(
     cors({
-      origin: "http://localhost:3000", // Разрешаем только Next.js
+      origin: "*", // Разрешаем только Next.js
       methods: ["GET", "POST", "PUT", "DELETE"], // Разрешенные методы
       allowedHeaders: ["Content-Type", "Authorization"], // Разрешенные заголовки
       credentials: true, // Разрешаем куки и авторизацию
