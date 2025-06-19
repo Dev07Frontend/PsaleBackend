@@ -163,7 +163,7 @@ const userRoutes = new Elysia({ prefix: "/user" })
         throw new Error("Failed to save file");
       }
 
-      const url = `http://localhost:3050/uploads/${sanitizedFileName}`;
+      const url = `http://gw48so0ko4g8go00soo0gswc.109.172.101.92.sslip.io/uploads/${sanitizedFileName}`;
 
       const updatedUser = await prisma.user.update({
         where: { id: userId },
