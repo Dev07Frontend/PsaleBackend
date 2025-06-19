@@ -8,14 +8,15 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const authRoutes = new Elysia({ prefix: "/auth" })
   .post(
     "/register",
-    async ({ body }) => {
+    async ({ body, set }) => {
       const { email, password, firstName, lastName, avatarURL, bgCover } = body;
 
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
       if (existingUser) {
-        return { error: "Email already in use" };
+        set.status = 400;
+        return { error: "Электронная почта, которая уже используется" };
       }
 
       const passwordHash = await argon2.hash(password);
@@ -53,19 +54,15 @@ const authRoutes = new Elysia({ prefix: "/auth" })
   )
   .post(
     "/login",
-    async ({ body }) => {
+    async ({ body, set }) => {
       const { email, password, rememberMe = false } = body;
 
       const user = await prisma.user.findUnique({
         where: { email },
       });
-      if (!user) {
-        return { error: "Invalid credentials" };
-      }
-
-      const valid = await argon2.verify(user.password, password);
-      if (!valid) {
-        return { error: "Invalid credentials" };
+      if (!user || !(await argon2.verify(user.password, password))) {
+        set.status = 401;
+        return { error: "Неверные учетные данные" };
       }
 
       const tokenExpiresIn = rememberMe ? "7d" : "1h";
